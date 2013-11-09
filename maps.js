@@ -1,1 +1,4 @@
-var maps = {};
+var maps = {
+	markers: {},
+	infoWindow: {}
+};
