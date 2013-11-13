@@ -45,6 +45,7 @@ buster.addMarker = function(location){
     if(this.map === null){
         buster.temp = location;
         setTimeout('buster.addMarker(buster.temp);', 100);
+        return -1;
     }
 
     var markerPos = new google.maps.LatLng(location.lat, location.lng);
