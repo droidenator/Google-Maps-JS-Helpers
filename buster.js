@@ -42,6 +42,11 @@ buster.createMap = function(){
  * @returns {number} - Returns the key for later accessing the marker object
  */
 buster.addMarker = function(location){
+    if(this.map === null){
+        buster.temp = location;
+        setTimeout('buster.addMarker(buster.temp);', 100);
+    }
+
     var markerPos = new google.maps.LatLng(location.lat, location.lng);
     var key = this.objLength(this.markers);
 
@@ -72,4 +77,16 @@ buster.objLength = function(obj){
         }
         return +length;
     }
+}
+
+
+//TODO - Figure out reliable way to be certain map has been initialized
+buster.initCheck = function(func, arg){
+    console.log('init check!');
+    if(this.map === null){
+        buster.temp = arg;
+        setTimeout(func(arg), 1);
+        return false;
+    }
+    return true;
 }
