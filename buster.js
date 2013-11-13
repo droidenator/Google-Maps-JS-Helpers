@@ -34,3 +34,42 @@ buster.createMap = function(){
 	var pos = new google.maps.LatLng(buster.center.lat, buster.center.lng);
 	buster.map.setCenter(pos);	
 }
+
+/**
+ * Adds a marker to a map.
+ *
+ * @param {object} - location object containing lat, lng, name
+ * @returns {number} - Returns the key for later accessing the marker object
+ */
+buster.addMarker = function(location){
+    var markerPos = new google.maps.LatLng(location.lat, location.lng);
+    var key = this.objLength(this.markers);
+
+    this.markers[key] = new google.maps.Marker({
+        position: markerPos,
+        map: this.map,
+        title: location.name
+    });
+
+    //TODO - Add support for content handling
+
+    return key;
+}
+
+/**
+ * Returns the length of an object
+ *
+ * @param obj
+ * @returns {number}
+ */
+buster.objLength = function(obj){
+    if(Object.keys){
+        return +Object.keys(obj).length;
+    } else {
+        var length = 0;
+        for( var key in obj){
+            if(obj.hasOwnProperty(key)) length++;
+        }
+        return +length;
+    }
+}
