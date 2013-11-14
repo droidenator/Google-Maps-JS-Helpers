@@ -3,6 +3,7 @@ var buster = {
 	infoWindow: null,
 	map: null,
 	mapId: null,
+	timeout: null,
 	center: {},
 	mapOptions: {
 		zoom: 12,
@@ -42,23 +43,18 @@ buster.createMap = function(){
  * @returns {number} - Returns the key for later accessing the marker object
  */
 buster.addMarker = function(location){
-    if(this.map === null){
-        buster.temp = location;
-        setTimeout('buster.addMarker(buster.temp);', 100);
-        return -1;
-    }
+    if(!buster.initCheck(buster.addMarker, location)) return -1;
 
     var markerPos = new google.maps.LatLng(location.lat, location.lng);
-    var key = this.objLength(this.markers);
+    var key = buster.objLength(buster.markers);
 
-    this.markers[key] = new google.maps.Marker({
+    buster.markers[key] = new google.maps.Marker({
         position: markerPos,
-        map: this.map,
+        map: buster.map,
         title: location.name
     });
 
     //TODO - Add support for content handling
-
     return key;
 }
 
@@ -81,12 +77,21 @@ buster.objLength = function(obj){
 }
 
 
-//TODO - Figure out reliable way to be certain map has been initialized
+/**
+ * Checks to verify a map has been created; calls the specified function and arg at the end of timeout
+ * @TODO - better method would be check map's status and, if not created, bind function to the map's event listener
+ *
+ * @param func - function to be called
+ * @param arg - arguments to be supplied to argument
+ * @returns {boolean}
+ */
 buster.initCheck = function(func, arg){
-    console.log('init check!');
-    if(this.map === null){
-        buster.temp = arg;
-        setTimeout(func(arg), 1);
+    if(buster.map == null){
+        if(buster.timeout == null){
+            buster.timeout = setTimeout(function(){
+            	func(arg);
+            }, 200);
+        }
         return false;
     }
     return true;
