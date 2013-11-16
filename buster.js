@@ -45,7 +45,7 @@ buster.createMap = function(createInfo){
 /**
  * Adds a marker to a map.
  *
- * @param {object} - location object containing lat, lng, name
+ * @param {object} - location object containing lat, lng, name, and content
  * @returns {number} - Returns the key for later accessing the marker object
  */
 buster.addMarker = function(location){
@@ -59,6 +59,16 @@ buster.addMarker = function(location){
         map: buster.map,
         title: location.name
     });
+
+    if(buster.infoWindow !== null && typeof location.content != 'undefined'){
+        buster.markers[key].content = location.content;
+
+        //Bind info window to click event
+        google.maps.event.addListener(buster.markers[key], 'click', function() {
+            buster.infoWindow.setContent(buster.markers[key].content);
+            buster.infoWindow.open(buster.map,buster.markers[key]);
+        });
+    }
 
     //TODO - Add support for content handling
     return key;
