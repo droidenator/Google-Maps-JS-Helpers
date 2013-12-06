@@ -57,12 +57,17 @@ buster.addMarker = function(location){
 
     if(typeof location.latLng == 'undefined') location.latLng = google.maps.LatLng(location.lat, location.lng);
     var key = buster.objLength(buster.markers);
-
-    buster.markers[key] = new google.maps.Marker({
+    
+    var options = {
         position: location.latLng,
         map: buster.map,
         title: location.name
-    });
+    }
+
+    if(location.icon !== 'undefined') options.icon = location.icon;
+    
+    buster.markers[key] = new google.maps.Marker(options);
+    
 
     if(buster.infoWindow !== null && typeof location.content != 'undefined'){
         buster.markers[key].content = location.content;
