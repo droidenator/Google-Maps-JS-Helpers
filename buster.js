@@ -5,6 +5,7 @@ var buster = {
 	mapId: null,
 	timeout: null,
 	center: {},
+	bounds: null,
 	mapOptions: {
 		zoom: 12,
 		mapTypeId: google.maps.MapTypeId.ROADMAP	
@@ -19,8 +20,8 @@ var buster = {
  * @param {boolean} Whether or not to create the infowindow object
  */
 buster.init = function(mapId, center, createInfo){
-	this.mapId = mapId;
-	this.center = center;
+	buster.mapId = mapId;
+	buster.center = center;	
 
 	google.maps.event.addDomListener(window, 'load', function(){
         buster.createMap(createInfo);
@@ -35,8 +36,11 @@ buster.createMap = function(createInfo){
 	buster.map = new google.maps.Map(document.getElementById(buster.mapId), buster.mapOptions);
 	
 	//Set center. @TODO - add support for using current location or geocoding of supplied address
-	var pos = new google.maps.LatLng(buster.center.lat, buster.center.lng);
+	var pos = (buster.bounds != null) ? buster.bounds.getCenter() : new google.maps.LatLng(buster.center.lat, buster.center.lng);
 	buster.map.setCenter(pos);
+	
+	//Fit bounds if necessary
+	if(buster.bounds != null) buster.map.fitBounds(buster.bounds);
 
     //Create info window
     if(createInfo) buster.infoWindow = new google.maps.InfoWindow();
@@ -45,17 +49,17 @@ buster.createMap = function(createInfo){
 /**
  * Adds a marker to a map.
  *
- * @param {object} - location object containing lat, lng, name, and content
+ * @param {object} - location object containing lat, lng, name, and content. Optional to pass generated LatLng object from google maps
  * @returns {number} - Returns the key for later accessing the marker object
  */
 buster.addMarker = function(location){
     if(!buster.initCheck(buster.addMarker, location)) return -1;
 
-    var markerPos = new google.maps.LatLng(location.lat, location.lng);
+    if(typeof location.latLng == 'undefined') location.latLng = google.maps.LatLng(location.lat, location.lng);
     var key = buster.objLength(buster.markers);
 
     buster.markers[key] = new google.maps.Marker({
-        position: markerPos,
+        position: location.latLng,
         map: buster.map,
         title: location.name
     });
@@ -72,6 +76,12 @@ buster.addMarker = function(location){
 
     //TODO - Add support for content handling
     return key;
+}
+
+buster.addToBounds = function(location){
+	if(buster.bounds == null) buster.bounds = new google.maps.LatLngBounds();
+	if(typeof location.latLng == 'undefined') location.latLng = new google.maps.LatLng(location.lat, location.lng);	
+	buster.bounds.extend(location.latLng);	
 }
 
 /**
